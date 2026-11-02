@@ -23,6 +23,14 @@ public class CategoryService(DataContext _repository) : ICategoryService
 
     public async Task Delete(int id)
     {
+
+        var hasItems = await _repository.Items.AnyAsync(i => i.CategoryId == id);
+
+        if (hasItems)
+        {
+            throw new BusinessRuleException("category cannot be deleted while it has items");
+        }
+
         var category = await GetById(id);
 
         _repository.Categories.Remove(category);

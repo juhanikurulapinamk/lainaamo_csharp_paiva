@@ -83,6 +83,13 @@ public class CategoriesController(ICategoryService _categoryService) : LainaamoC
         {
             return NotFound(new { title = "category not found", detail = e.Message });
         }
+
+        catch (BusinessRuleException e)
+        {
+            // 409 Conflict: pyyntö oli kelvollinen, mutta se on ristiriidassa
+            // resurssin nykytilan kanssa
+            return Conflict(new { title = "cannot delete category", detail = e.Message });
+        }
     }
 
     
