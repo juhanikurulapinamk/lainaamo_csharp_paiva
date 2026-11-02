@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class CategoriesController(ICategoryService _categoryService) : LainaamoControllerBase
+public class CategoriesController(ICategoryService _categoryService, IItemService _itemService) : LainaamoControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll()
@@ -33,6 +33,19 @@ public class CategoriesController(ICategoryService _categoryService) : LainaamoC
         return Ok(
            
             new CategoryDto { Id = category.Id, Name = category.Name });
+    }
+
+    [HttpPost("{id}/items")]
+    public async Task<ActionResult<ItemDto>> CreateItem(int id, CreateItemReq reqData)
+    {
+        reqData.CategoryId = id;
+        var item = await _itemService.Create(reqData);
+        var itemDto = new ItemDto
+        {
+            Name = item.Name,
+            CategoryName = item.Category!.Name
+        };
+        return Ok(itemDto);
     }
 
     // GET api/categories/5

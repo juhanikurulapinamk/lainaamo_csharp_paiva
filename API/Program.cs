@@ -29,6 +29,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
 });
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IItemService, ItemService>();
 
 
 
