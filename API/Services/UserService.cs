@@ -32,6 +32,11 @@ namespace API.Services
             return user;
         }
 
+        public Task<string> Login(string username, string password)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<AppUser> Register(string username, string password)
         {
             var existingUser = await GetByUserName(username);
