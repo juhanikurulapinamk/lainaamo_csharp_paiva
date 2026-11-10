@@ -9,5 +9,7 @@ namespace API.Interfaces
         Task<IEnumerable<Item>> GetAll();
         Task<Item> GetById(int id);
         Task<Item> Create(CreateItemReq requestData);
+
+        Task<ItemCopy> CreateCopy(int id, CreateItemCopyReq requestData);
     }
 }

@@ -11,7 +11,7 @@ namespace API.Models
         // Inventaarionumero, esim. "CAM-001"
         public required string InventoryCode { get; set; }
 
-        public int ItemId { get; set; }
+        public required int ItemId { get; set; }
         public Item? Item { get; set; }
     }
 }

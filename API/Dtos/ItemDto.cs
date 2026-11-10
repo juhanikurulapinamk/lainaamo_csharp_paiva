@@ -12,4 +12,11 @@ namespace API.Dtos
 
         public int CopyCount { get; set; }
     }
+
+    public class ItemDtoSlim
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+    }
 }
+

@@ -9,6 +9,19 @@ namespace API.Services;
 
 public class ItemService(DataContext _repository) : IItemService
 {
+
+    // Sama tarkistus tarvitaan kahdessa metodissa, joten se on omassa metodissaan
+    private async Task EnsureNameIsFree(string inventoryCode, int? exceptId = null)
+    {
+        var taken = await _repository.ItemCopies
+            .AnyAsync(ic => ic.InventoryCode == inventoryCode && ic.Id != exceptId);
+
+        if (taken)
+        {
+            throw new BusinessRuleException($"copy {inventoryCode} already exists");
+        }
+    }
+
     public async Task<Item> Create(CreateItemReq requestData)
     {
         // Viiteavaimen pitää osoittaa olemassa olevaan kategoriaan.
@@ -33,6 +46,22 @@ public class ItemService(DataContext _repository) : IItemService
 
         // Haetaan tallennettu nimike uudelleen, jotta kategoria ja kappaleet tulevat mukaan
         return await GetById(item.Id);
+    }
+
+    public async Task<ItemCopy> CreateCopy(int id, CreateItemCopyReq requestData)
+    {
+        await EnsureNameIsFree(requestData.InventoryCode);
+
+        var itemCopy = new ItemCopy
+        {
+            InventoryCode = requestData.InventoryCode,
+            ItemId = id
+        };
+
+        await _repository.ItemCopies.AddAsync(itemCopy);
+        await _repository.SaveChangesAsync();
+
+        return itemCopy;
     }
 
     public async Task<IEnumerable<Item>> GetAll()
