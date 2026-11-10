@@ -16,11 +16,13 @@ public class ItemsController(IItemService _itemService) : LainaamoControllerBase
             Id = i.Id,
             Name = i.Name,
             Description = i.Description,
+            CopyCount = i.Copies.Count,
             Category = new CategoryDto
             {
                 Id = i.Category!.Id,
                 Name = i.Category!.Name
-            }
+            },
+           
            
             
         });

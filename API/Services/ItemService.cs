@@ -37,13 +37,17 @@ public class ItemService(DataContext _repository) : IItemService
 
     public async Task<IEnumerable<Item>> GetAll()
     {
-        return await _repository.Items.Include(i => i.Category).ToListAsync();
+        return await _repository.Items
+        .Include(i => i.Category)
+        .Include(i => i.Copies)
+        .ToListAsync();
     }
 
     public async Task<Item> GetById(int id)
         {
             var item = await _repository.Items
                 .Include(i => i.Category)
+                .Include(i => i.Copies)
                 
                 .FirstOrDefaultAsync(i => i.Id == id);
 

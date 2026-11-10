@@ -17,5 +17,8 @@ namespace API.Models
         // Sitä EI ole tietokannassa sarakkeena — se on olemassa
         // vain koodissa, jotta pääset kategoriaan käsiksi nimikkeen kautta.
         public Category? Category { get; set; }
+        
+        // Item.cs
+        public ICollection<ItemCopy> Copies { get; set; } = new List<ItemCopy>();
     }
 }

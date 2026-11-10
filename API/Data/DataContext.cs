@@ -10,4 +10,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     // Tässä siis Categories.
     public DbSet<Category> Categories { get; set; }
     public DbSet<Item> Items { get; set; }
+
+    
+    // DataContext.cs
+    public DbSet<ItemCopy> ItemCopies { get; set; }
 }

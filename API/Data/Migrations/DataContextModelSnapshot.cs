@@ -57,6 +57,29 @@ namespace API.Data.Migrations
                     b.ToTable("Items");
                 });
 
+            modelBuilder.Entity("API.Models.ItemCopy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("InventoryCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InventoryCode")
+                        .IsUnique();
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("ItemCopies");
+                });
+
             modelBuilder.Entity("API.Models.Item", b =>
                 {
                     b.HasOne("API.Models.Category", "Category")
@@ -68,9 +91,25 @@ namespace API.Data.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("API.Models.ItemCopy", b =>
+                {
+                    b.HasOne("API.Models.Item", "Item")
+                        .WithMany("Copies")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+                });
+
             modelBuilder.Entity("API.Models.Category", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("API.Models.Item", b =>
+                {
+                    b.Navigation("Copies");
                 });
 #pragma warning restore 612, 618
         }
