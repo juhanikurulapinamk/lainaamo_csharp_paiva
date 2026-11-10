@@ -7,8 +7,8 @@ namespace API.Dtos
         public required string Name { get; set; }
         public string? Description { get; set; }
 
-        // Kategorian nimi, ei koko kategoriaoliota
-        public required string CategoryName { get; set; }
+        
+        public CategoryDto? Category {get; set; }
 
         public int CopyCount { get; set; }
     }

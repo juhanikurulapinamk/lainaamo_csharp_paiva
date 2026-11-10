@@ -16,8 +16,12 @@ public class ItemsController(IItemService _itemService) : LainaamoControllerBase
             Id = i.Id,
             Name = i.Name,
             Description = i.Description,
-            // i.Category on null, koska sitä ei ladattu!
-            CategoryName = i.Category!.Name,
+            Category = new CategoryDto
+            {
+                Id = i.Category!.Id,
+                Name = i.Category!.Name
+            }
+           
             
         });
         return Ok(dtos);
@@ -30,7 +34,11 @@ public class ItemsController(IItemService _itemService) : LainaamoControllerBase
             var item = await _itemService.Create(requestData);
             return Ok(new ItemDto {
                 Name = item.Name,
-                CategoryName = item.Category!.Name
+                Category = new CategoryDto
+                {
+                    Id = item.Category!.Id,
+                    Name = item.Category!.Name
+                }
             });
         } catch(NotFoundException)
         {

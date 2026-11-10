@@ -26,13 +26,14 @@ public class CategoriesController(ICategoryService _categoryService, IItemServic
     [HttpPost]
     public async Task<ActionResult<CategoryDto>> Create(CreateCategoryReq req)
     {
-        var category = await _categoryService.Create(req);
+        try {
+            var category = await _categoryService.Create(req);
 
-        // CreatedAtAction palauttaa 201 ja Location-headerin,
-        // josta luotu resurssi löytyy
-        return Ok(
-           
-            new CategoryDto { Id = category.Id, Name = category.Name });
+            
+            return Ok(new CategoryDto { Id = category.Id, Name = category.Name });
+        } catch(BusinessRuleException e) {
+            return Conflict(new { title = "cannot create category", detail = e.Message });
+        }
     }
 
     [HttpPost("{id}/items")]
@@ -43,7 +44,7 @@ public class CategoriesController(ICategoryService _categoryService, IItemServic
         var itemDto = new ItemDto
         {
             Name = item.Name,
-            CategoryName = item.Category!.Name
+           
         };
         return Ok(itemDto);
     }
@@ -78,6 +79,14 @@ public class CategoriesController(ICategoryService _categoryService, IItemServic
         catch (NotFoundException e)
         {
             return NotFound(new { title = "category not found", detail = e.Message });
+        }
+        catch(BusinessRuleException e)
+        {
+            return Conflict(new
+            {
+                title = "cannot update catgory",
+                detail = e.Message    
+            });
         }
     }
 

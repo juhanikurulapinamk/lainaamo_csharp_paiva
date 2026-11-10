@@ -7,10 +7,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
+
+
 public class CategoryService(DataContext _repository) : ICategoryService
 {
+
+    // Sama tarkistus tarvitaan kahdessa metodissa, joten se on omassa metodissaan
+    private async Task EnsureNameIsFree(string name, int? exceptId = null)
+    {
+        var taken = await _repository.Categories
+            .AnyAsync(c => c.Name == name && c.Id != exceptId);
+
+        if (taken)
+        {
+            throw new BusinessRuleException($"category {name} already exists");
+        }
+    }
+
     public async Task<Category> Create(CreateCategoryReq requestData)
     {
+
+        await EnsureNameIsFree(requestData.Name);
+
         var category = new Category { Name = requestData.Name };
 
         // EF Coressa rivi lisätään ensin muutoslistaan
@@ -53,6 +71,9 @@ public class CategoryService(DataContext _repository) : ICategoryService
     public async Task<Category> Update(int id, CreateCategoryReq requestData)
     {
         var category = await GetById(id);
+
+        // tämä on uusi. Oma id jätetään pois, jotta nimen voi tallentaa ennallaan.
+        await EnsureNameIsFree(requestData.Name, id);
 
         category.Name = requestData.Name;
 
