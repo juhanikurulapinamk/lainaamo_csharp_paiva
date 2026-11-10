@@ -3,7 +3,9 @@
 
 using API.Data;
 using API.Interfaces;
+using API.Models;
 using API.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +32,10 @@ builder.Services.AddDbContext<DataContext>(opt =>
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IItemService, ItemService>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+// PasswordHasher on tilaton, joten se voi olla singleton
+builder.Services.AddSingleton<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
 
 
 

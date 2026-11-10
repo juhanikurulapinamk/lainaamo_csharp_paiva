@@ -14,4 +14,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     
     // DataContext.cs
     public DbSet<ItemCopy> ItemCopies { get; set; }
+
+    
+    public DbSet<AppUser> Users { get; set; }
 }
