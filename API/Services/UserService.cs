@@ -14,8 +14,31 @@ namespace API.Services
     // DataContext on jo rekisteröity aiemmin käyttäen AddDbContext-metodia Program.cs-filussa
     public class UserService(DataContext _repository, IPasswordHasher<AppUser> _passwordHasher) : IUserService
     {
+        public async Task<AppUser?> GetByUserName(string username)
+        {
+            // FirstOrDefaultAsync palauttaa null, jos hakuehdolla ei löydy yhtään riviä tietokannasta
+            // muuten sen rivin tiedot, joka niillä löytyy
+
+            // FirstAsync puolestaan heittää poikkeuksen, jos hakuehdolla ei löydy osumia tietokannasta
+            
+
+            // EF Core luo tästä sql-kyselyn SELECT * FROM Users WHERE LOWER(UserName) = ? LIMIT 1;
+            // jossa kysymysmerkin paikalle tulee username-muuttujan arvo
+
+
+            // JUHANI juhani
+
+            var user = await _repository.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
+            return user;
+        }
+
         public async Task<AppUser> Register(string username, string password)
         {
+            var existingUser = await GetByUserName(username);
+            if (existingUser != null)
+            {
+                throw new UserRegistrationException("username must be unique");
+            }
             var user = new AppUser
             {
                 UserName = username,

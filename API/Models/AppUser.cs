@@ -1,6 +1,9 @@
 
+using Microsoft.EntityFrameworkCore;
+
 namespace API.Models
 {
+    [Index(nameof(UserName),  IsUnique = true)]
     public class AppUser
     {
         public int Id { get; set; }

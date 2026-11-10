@@ -6,5 +6,7 @@ namespace API.Interfaces
     public interface IUserService
     {
         Task<AppUser> Register(string username, string password);
+        
+        Task<AppUser?> GetByUserName(string username);
     }
 }
