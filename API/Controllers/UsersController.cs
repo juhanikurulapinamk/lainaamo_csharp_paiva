@@ -11,6 +11,28 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class UsersController(IUserService _userService) : ControllerBase
     {
+        
+        
+        
+// UsersController.cs, Register-actionin alle
+
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginRes>> Login(LoginReq requestData)
+        {
+            try
+            {
+                var token = await _userService.Login(requestData.UserName, requestData.Password);
+
+                return new LoginRes { Token = token };
+            }
+            catch (NotFoundException e)
+            {
+                // Sama vastaus sekä tuntemattomalle käyttäjälle että väärälle salasanalle,
+                // jotta vastauksesta ei voi päätellä, mitkä käyttäjänimet ovat olemassa
+                return NotFound(new { title = "user not found", detail = e.Message });
+            }
+        }
+        
         [HttpPost("register")]
         
         public async Task<ActionResult<RegisterRes>> Register(RegisterReq requestData)

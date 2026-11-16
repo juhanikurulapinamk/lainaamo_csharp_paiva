@@ -1,10 +1,14 @@
 
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using API.CustomExceptions;
 using API.Data;
 using API.Interfaces;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services
 {
@@ -12,8 +16,43 @@ namespace API.Services
     // kun nyt käytämme EF Corea, pystymme injektoimaan serviceen
     // suoraan DataContextin ja käyttää sitä repositoryna
     // DataContext on jo rekisteröity aiemmin käyttäen AddDbContext-metodia Program.cs-filussa
-    public class UserService(DataContext _repository, IPasswordHasher<AppUser> _passwordHasher) : IUserService
+    public class UserService(DataContext _repository, IPasswordHasher<AppUser> _passwordHasher, ITokenTool _tokenTool) : IUserService
     {
+        
+        // lisää UserService.cs:n alkuun:
+        // using System.IdentityModel.Tokens.Jwt;
+        // using System.Security.Claims;
+        // using System.Text;
+        // using Microsoft.IdentityModel.Tokens;
+
+        
+        public async Task<string> Login(string username, string password)
+        {
+
+            var user = await GetByUserName(username);
+
+            if (user == null)
+            {
+                throw new NotFoundException("user not found");
+            }
+
+            // VerifyHashedPassword lukee tallennetusta hashista saltin ja asetukset,
+            // laskee samoilla asetuksilla hashin annetusta salasanasta ja vertaa niitä
+            var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, password);
+
+            if (verifyResult == PasswordVerificationResult.Failed)
+            {
+                throw new NotFoundException("user not found");
+            }
+
+            // tokenin luonti on tämän takana
+            var token = _tokenTool.CreateToken(user);
+            return token;
+    
+        
+
+        }
+
         public async Task<AppUser?> GetByUserName(string username)
         {
             // FirstOrDefaultAsync palauttaa null, jos hakuehdolla ei löydy yhtään riviä tietokannasta

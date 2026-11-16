@@ -7,6 +7,8 @@ namespace API.Interfaces
     {
         Task<AppUser> Register(string username, string password);
         
+        Task<string> Login(string username, string password);
+        
         Task<AppUser?> GetByUserName(string username);
     }
 }
