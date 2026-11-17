@@ -10,6 +10,8 @@ namespace API.Interfaces
         Task<Item> GetById(int id);
         Task<Item> Create(CreateItemReq requestData);
 
-        Task<ItemCopy> CreateCopy(int id, CreateItemCopyReq requestData);
+        //Task<ItemCopy> CreateCopy(int id, CreateItemCopyReq requestData);
+
+        Task<ItemCopy> AddCopy(int itemId, CreateItemCopyReq requestData);
     }
 }

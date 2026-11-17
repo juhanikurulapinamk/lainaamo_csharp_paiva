@@ -1,10 +1,14 @@
 
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using API.CustomExceptions;
 using API.Data;
 using API.Interfaces;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services
 {
@@ -12,8 +16,32 @@ namespace API.Services
     // kun nyt käytämme EF Corea, pystymme injektoimaan serviceen
     // suoraan DataContextin ja käyttää sitä repositoryna
     // DataContext on jo rekisteröity aiemmin käyttäen AddDbContext-metodia Program.cs-filussa
-    public class UserService(DataContext _repository, IPasswordHasher<AppUser> _passwordHasher) : IUserService
+    public class UserService(
+        DataContext _repository, 
+        IPasswordHasher<AppUser> _passwordHasher, 
+        ITokenTool _tokenTool) : IUserService
     {
+
+
+        
+        public async Task<AppUser> SetRole(int userId, string role)
+        {
+            var user = await _repository.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new NotFoundException($"user {userId} not found");
+            user.Role = role;
+            await _repository.SaveChangesAsync();
+
+            return user;
+        }
+
+
+        
+        public async Task<IEnumerable<AppUser>> GetAll()
+        {
+            // tämä tekee sql-kyselyn SELECT * FROM Users;
+            var users = await _repository.Users.ToListAsync();
+            return users;
+        }
+
         public async Task<AppUser?> GetByUserName(string username)
         {
             // FirstOrDefaultAsync palauttaa null, jos hakuehdolla ei löydy yhtään riviä tietokannasta
@@ -32,10 +60,27 @@ namespace API.Services
             return user;
         }
 
-        public Task<string> Login(string username, string password)
+        public async Task<string> Login(string username, string password)
+    {
+        
+        var user = await GetByUserName(username);
+        if (user == null)
         {
-            throw new NotImplementedException();
+            throw new NotFoundException("user not found");
         }
+
+        // VerifyHashedPassword lukee tallennetusta hashista saltin ja asetukset,
+        // laskee samoilla asetuksilla hashin annetusta salasanasta ja vertaa niitä.
+        // Vertailu on sisäisesti vakioaikainen, joten ajastushyökkäys ei onnistu.
+        var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, password);
+
+        if (verifyResult == PasswordVerificationResult.Failed)
+        {
+            throw new NotFoundException("user not found");
+        }
+
+        return _tokenTool.CreateToken(user);
+    }
 
         public async Task<AppUser> Register(string username, string password)
         {

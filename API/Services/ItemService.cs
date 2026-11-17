@@ -48,7 +48,7 @@ public class ItemService(DataContext _repository) : IItemService
         return await GetById(item.Id);
     }
 
-    public async Task<ItemCopy> CreateCopy(int id, CreateItemCopyReq requestData)
+   /* public async Task<ItemCopy> CreateCopy(int id, CreateItemCopyReq requestData)
     {
         await EnsureNameIsFree(requestData.InventoryCode);
 
@@ -62,6 +62,33 @@ public class ItemService(DataContext _repository) : IItemService
         await _repository.SaveChangesAsync();
 
         return itemCopy;
+    } */
+
+    
+    public async Task<ItemCopy> AddCopy(int itemId, CreateItemCopyReq requestData)
+    {
+        // Nimikkeen pitää olla olemassa. GetById heittää NotFoundExceptionin, jos ei ole.
+        await GetById(itemId);
+
+        // Inventaarionumero on yksilöllinen, samoin kuin kategorian nimi
+        var codeTaken = await _repository.ItemCopies
+            .AnyAsync(c => c.InventoryCode == requestData.InventoryCode);
+
+        if (codeTaken)
+        {
+            throw new BusinessRuleException($"inventory code {requestData.InventoryCode} already exists");
+        }
+
+        var copy = new ItemCopy
+        {
+            InventoryCode = requestData.InventoryCode,
+            ItemId = itemId
+        };
+
+        await _repository.ItemCopies.AddAsync(copy);
+        await _repository.SaveChangesAsync();
+
+        return copy;
     }
 
     public async Task<IEnumerable<Item>> GetAll()

@@ -1,11 +1,10 @@
-using API.Models;
 
-namespace API.Dtos;
-
-public class ItemCopyDto
+namespace API.Dtos
 {
-    public int Id { set; get; }
-    public required string InventoryCode { set; get; }
-
-    
+    public class ItemCopyDto
+    {
+        public int Id { get; set; }
+        public required string InventoryCode { get; set; }
+        public int ItemId { get; set; }
+    }
 }
